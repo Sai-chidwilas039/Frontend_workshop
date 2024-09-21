@@ -34,7 +34,7 @@ function buildQuiz() {
         for (let letter in currentQuestion.answers) {
             answers.push(
                 `<label>
-                    <input type="radio" name="question${questionIndex}" value="${letter}">
+                    <input type="radio" name="question${questionIndex}" value="${letter}" onclick="selectAnswer(this)">
                     ${letter}: ${currentQuestion.answers[letter]}
                 </label>`
             );
@@ -49,14 +49,29 @@ function buildQuiz() {
     quizContainer.innerHTML = output.join('');
 }
 
+let selectedAnswers = [];
+
+function selectAnswer(selectedInput) {
+    const questionIndex = selectedInput.name.replace('question', '');
+    selectedAnswers[questionIndex] = selectedInput.value;
+}
+
 function showResults() {
     const answerContainers = quizContainer.querySelectorAll('.answers');
     let score = 0;
 
     questions.forEach((currentQuestion, questionIndex) => {
         const answerContainer = answerContainers[questionIndex];
-        const selector = `input[name=question${questionIndex}]:checked`;
-        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+        const userAnswer = selectedAnswers[questionIndex];
+
+        answerContainer.querySelectorAll('label').forEach(label => {
+            const input = label.querySelector('input');
+            if (input.value === currentQuestion.correctAnswer) {
+                label.style.backgroundColor = '#c8e6c9'; // Correct answer color
+            } else if (input.value === userAnswer) {
+                label.style.backgroundColor = '#ffcdd2'; // Incorrect answer color
+            }
+        });
 
         if (userAnswer === currentQuestion.correctAnswer) {
             score++;
