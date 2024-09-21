@@ -1,75 +1,71 @@
 const questions = [
     {
-        question: "Which is the largest animal in the world?",
-        answers: [
-            {text: "Shark", correct: false},
-            {text: "Blue whale", correct: true},
-            {text: "Elephant", correct: false},
-            {text: "Giraffe", correct: false},
-        ]
+        question: "What is the capital of France?",
+        answers: {
+            a: "Berlin",
+            b: "Madrid",
+            c: "Paris",
+            d: "Lisbon"
+        },
+        correctAnswer: "c"
     },
     {
-        question: "Which is the largest animal in the world?",
-        answers: [
-            {text: "Shark", correct: false},
-            {text: "Blue whale", correct: true},
-            {text: "Elephant", correct: false},
-            {text: "Giraffe", correct: false},
-        ]
-    },
-    {
-        question: "Which is the largest animal in the world?",
-        answers: [
-            {text: "Shark", correct: false},
-            {text: "Blue whale", correct: true},
-            {text: "Elephant", correct: false},
-            {text: "Giraffe", correct: false},
-        ]
-    },
-    {
-        question: "Which is the largest animal in the world?",
-        answers: [
-            {text: "Shark", correct: false},
-            {text: "Blue whale", correct: true},
-            {text: "Elephant", correct: false},
-            {text: "Giraffe", correct: false},
-        ]
-    },
+        question: "What is 2 + 2?",
+        answers: {
+            a: "3",
+            b: "4",
+            c: "5",
+            d: "6"
+        },
+        correctAnswer: "b"
+    }
 ];
 
-const questionElement = document.getElementById("question");
-const answerButtons = document.getElementById("answer-buttons");
-const nextButton = document.getElementById("next-btn");
+const quizContainer = document.getElementById('quiz');
+const resultsContainer = document.getElementById('results');
+const submitButton = document.getElementById('submit');
 
-let currentQuestionIndex = 0;
-let score = 0;
+function buildQuiz() {
+    const output = [];
 
-function startQuiz(){
-    currentQuestionIndex = 0;
-    score = 0;
-    nextButton.innerHTML = "Next";
-    showQuestion();
-}
+    questions.forEach((currentQuestion, questionIndex) => {
+        const answers = [];
 
-function showQuestion(){
-    resetState();
-    let currentQuestion = questions[currentQuestionIndex];
-    let questionNo = currentQuestionIndex + 1;
-    questionElement.innerHTML = questionNo + ". " + currentQuestion.question;
+        for (let letter in currentQuestion.answers) {
+            answers.push(
+                `<label>
+                    <input type="radio" name="question${questionIndex}" value="${letter}">
+                    ${letter}: ${currentQuestion.answers[letter]}
+                </label>`
+            );
+        }
 
-    currentQuestion.answers.forEach(answer => {
-        const button = document.createElement("button");
-        button.innerHTML = answer.text;
-        button.classList.add("btn");
-        answerButtons.appendChild(button);
+        output.push(
+            `<div class="question"> ${currentQuestion.question} </div>
+            <div class="answers"> ${answers.join('')} </div>`
+        );
     });
+
+    quizContainer.innerHTML = output.join('');
 }
 
-function resetState(){
-    nextButton.style.display = "none";
-    while(answerButtons.firstChild){
-        answerButtons.removeChild(answerButtons.firstChild);
-    }
+function showResults() {
+    const answerContainers = quizContainer.querySelectorAll('.answers');
+    let score = 0;
+
+    questions.forEach((currentQuestion, questionIndex) => {
+        const answerContainer = answerContainers[questionIndex];
+        const selector = `input[name=question${questionIndex}]:checked`;
+        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+        if (userAnswer === currentQuestion.correctAnswer) {
+            score++;
+        }
+    });
+
+    resultsContainer.innerHTML = `You scored ${score} out of ${questions.length}`;
 }
 
-startQuiz();
+buildQuiz();
+
+submitButton.addEventListener('click', showResults);
