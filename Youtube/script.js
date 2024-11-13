@@ -1,4 +1,3 @@
-// Mock data for demonstration
 const videos = [
     {
       id: "1",
